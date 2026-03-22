@@ -1,4 +1,5 @@
 import yt_dlp as yt_dlp
+import yt_dlp
 
 def download_YT(urls):
     ydl_opts = {
