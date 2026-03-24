@@ -1,35 +1,46 @@
 from pywinauto import Application
 import time
+import pyperclip 
 
-# Conectar a la aplicación de WhatsApp
-app = Application(backend="uia").connect(title_re=".*WhatsApp.*")  # Busca la ventana de WhatsApp
-ventana = app.window(title_re=".*WhatsApp.*")  # Obtiene la ventana principal
+# 1. Configuración de datos
+contacto = input('Nombre del contacto/grupo: ')
+mensaje = input('Mensaje a enviar: ')
+cantidad = int(input('¿Cuántas veces?: '))
 
-# Solicitar datos
-cantidad = int(input('Cuantos Mensajes: '))
-mensaje = input('Mensaje: ')
-contacto = input('Nombre o número del contacto/grupo: ')
+try:
+    # 2. Conectar y FORZAR la ventana al frente
+    print("Conectando con WhatsApp...")
+    app = Application(backend="uia").connect(title_re=".*WhatsApp.*", timeout=10)
+    ventana = app.window(title_re=".*WhatsApp.*")
+    
+    # Esto asegura que la ventana sea la activa en Windows
+    ventana.set_focus()
+    time.sleep(2)
 
-# 1: Buscar contacto/grupo
-ventana.type_keys("^f")  # Presiona Ctrl+F para abrir la búsqueda
-time.sleep(1)  
-ventana.type_keys(contacto)  # Escribe el nombre/número del contacto
-time.sleep(3)  
+    # 3. Ir al buscador (Usamos CTRL + N para "Nuevo Chat" que es más directo)
+    print(f"Buscando a: {contacto}")
+    ventana.type_keys("^n") 
+    time.sleep(1.5)
+    
+    # Escribimos el nombre
+    ventana.type_keys(contacto, with_spaces=True)
+    time.sleep(2)
 
-# 2: Seleccionar el primer resultado de la búsqueda
-ventana.type_keys("{DOWN}")  # Presiona la flecha hacia abajo para seleccionar 
-time.sleep(1)
-ventana.type_keys("{ENTER}")  # Presiona Enter para abrir el chat
-time.sleep(2)  
+    # Seleccionamos con ENTER el primer resultado
+    ventana.type_keys("{ENTER}")
+    time.sleep(1.5)
 
-# 3: Mover el foco al campo de texto del chat
-ventana.type_keys("{TAB}")  # Presiona Tab para mover el foco al campo de texto
-time.sleep(1) 
+    # 4. Enviar los mensajes usando Pegar (Ctrl + V)
+    print("Enviando mensajes...")
+    pyperclip.copy(mensaje)
 
-# 4: Escribir y enviar los mensajes
-for i in range(cantidad):
-    ventana.type_keys(f"{mensaje}")  # Escribe el mensaje
-    ventana.type_keys("{ENTER}")     # Presiona Enter para enviar
-    time.sleep(0.5)                  # Retraso entre mensajes
+    for i in range(cantidad):
+        # Pegamos y damos Enter
+        ventana.type_keys("^v{ENTER}")
+        time.sleep(0.3) 
 
-print("¡Lista la vueltica Patron!")
+    print("¡Listica la Vuelta Patron!")
+
+except Exception as e:
+    print(f"Ocurrió un problema: {e}")
+    print("TIP: Asegúrate de que WhatsApp esté abierto y que NO estés en una llamada.")
