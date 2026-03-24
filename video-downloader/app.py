@@ -1,5 +1,5 @@
+from main import download_video, clean_url
 import streamlit as st
-from main import download_video
 import re
 
 st.set_page_config(
@@ -13,6 +13,7 @@ st.markdown("Descarga videos de YouTube en formato MP4 fácilmente.")
 
 url = st.text_input("🔗 Pega la URL del video aquí:")
 
+# Función para validar la URL de YouTube
 def is_valid_youtube_url(url):
     pattern = r'(https?://)?(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[a-zA-Z0-9_-]{11}'
     return bool(re.match(pattern, url))
@@ -28,6 +29,8 @@ def progress_hook(d):
     elif d['status'] == 'finished':
         progress_bar.progress(100)
 
+
+# Botón para iniciar la descarga
 if st.button("⬇️ Descargar"):
     if not url:
         st.error("⚠️ Por favor ingresa una URL.")
@@ -36,7 +39,8 @@ if st.button("⬇️ Descargar"):
     else:
         try:
             with st.spinner("Descargando video..."):
-                progress_bar = st.progress(0)  # Se crea aquí cuando se necesita
+                progress_bar = st.progress(0)       # Se crea aquí cuando se necesita
+                url = clean_url(url)                # Limpia la URL antes de descargar
                 download_video(url, progress_hook)  # Solo la instanciamos
 
             st.success("✅ ¡Video descargado exitosamente!")
