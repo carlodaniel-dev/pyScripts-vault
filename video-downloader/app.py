@@ -1,4 +1,4 @@
-from main import download_video, clean_url
+from main import download_video, clean_url, get_video_info
 import streamlit as st
 import re
 
@@ -12,6 +12,7 @@ st.title("🎥 YouTube Downloader")
 st.markdown("Descarga videos de YouTube en formato MP4 fácilmente.")
 
 url = st.text_input("🔗 Pega la URL del video aquí:")
+buscar = st.button("🔍 Buscar video")
 
 # Función para validar la URL de YouTube
 def is_valid_youtube_url(url):
@@ -29,21 +30,57 @@ def progress_hook(d):
     elif d['status'] == 'finished':
         progress_bar.progress(100)
 
-
-# Botón para iniciar la descarga
-if st.button("⬇️ Descargar"):
+# Paso 1 — Buscar info al presionar el botón
+if buscar:
     if not url:
         st.error("⚠️ Por favor ingresa una URL.")
-    elif not is_valid_youtube_url(url):  
-        st.error("⚠️ La URL no es válida. Asegúrate de que sea un enlace de YouTube.")
     else:
         try:
+            with st.spinner("Obteniendo información del video..."):
+                st.session_state.video_info = get_video_info(url)
+                st.session_state.last_url = url
+        except Exception as e:
+            st.error(f"❌ URL inválida o error al obtener info: {str(e)}")
+
+# Paso 2 — Muestra info si ya fue buscada
+if 'video_info' in st.session_state:
+    info = st.session_state.video_info
+    minutes = info['duration'] // 60
+    seconds = info['duration'] % 60
+
+    if info['thumbnail']:
+        st.image(info['thumbnail'], use_container_width=True)
+
+    st.info(f"🎬 **{info['title']}**")
+    st.caption(f"⏱️ Duración: {minutes}:{seconds:02d} min")
+
+    # Paso 3 — Botón de descarga
+    if st.button("⬇️ Descargar"):
+        try:
             with st.spinner("Descargando video..."):
-                progress_bar = st.progress(0)       # Se crea aquí cuando se necesita
-                url = clean_url(url)                # Limpia la URL antes de descargar
-                download_video(url, progress_hook)  # Solo la instanciamos
-
+                progress_bar = st.progress(0)
+                download_video(url, progress_hook)
             st.success("✅ ¡Video descargado exitosamente!")
-
         except Exception as e:
             st.error(f"❌ Error al descargar: {str(e)}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

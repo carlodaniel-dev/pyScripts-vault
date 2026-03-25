@@ -11,6 +11,19 @@ def clean_url(url):
     clean = urlencode({'v': params['v'][0]})
     return urlunparse(parsed._replace(query=clean))
 
+def get_video_info(url):
+    ydl_opts = {
+        'noplaylist': True,
+        'quiet': True,        # No muestra logs en terminal
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        info = ydl.extract_info(url, download=False)  # download=False, solo obtiene info
+        return {
+            'title': info.get('title', 'Sin título'),
+            'duration': info.get('duration', 0),      # Duración en segundos
+            'thumbnail': info.get('thumbnail', None),
+        }
+
 def download_video(url, progress_hook=None):
     ydl_opts = {
         'format': 'best',
