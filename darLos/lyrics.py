@@ -1,3 +1,4 @@
+
 """
 LYRICS VISUALIZER - estilo TikTok
 ----------------------------------
@@ -10,7 +11,7 @@ import sys
 import random
 
 # ============================================
-# COLORES ESTILO TERMINAL (códigos ANSI)
+# COLORES ESTILO TERMINAL
 # ============================================
 COLORES = [
     "\033[91m",  # rojo
@@ -20,11 +21,12 @@ COLORES = [
     "\033[95m",  # morado
     "\033[96m",  # cyan
 ]
-RESET = "\033[0m"  # apaga el color, vuelve al color normal de la terminal
+
+RESET = "\033[0m"
 
 # ============================================
-# EDITA ESTA LISTA CON TU PROPIA LETRA
-# Cada elemento: (texto_de_la_linea, emoji, segundos_de_espera_antes)
+# LETRA
+# (texto_de_la_linea, emoji, segundos_de_espera_antes)
 # ============================================
 letra = [
     ("Escribe aquí tu primera línea...", "✨", 1.5),
@@ -35,29 +37,37 @@ letra = [
     ("Escribe aquí tu sexta línea...", "🌙", 2.0),
 ]
 
-
 def efecto_maquina_de_escribir(texto, delay=0.03, usar_color=False):
-    """Imprime el texto letra por letra, como si se estuviera escribiendo."""
+    """Imprime el texto letra por letra."""
+
     color = random.choice(COLORES) if usar_color else ""
     reset = RESET if usar_color else ""
+
     if usar_color:
         sys.stdout.write(color)
         sys.stdout.flush()
+
     for caracter in texto:
         sys.stdout.write(caracter)
         sys.stdout.flush()
         time.sleep(delay)
+
     sys.stdout.write(reset)
     print()
 
-
 def print_lyrics(letra, modo_maquina_de_escribir=True, usar_color=False):
-    print("\n\n\n")
+    """Imprime todas las líneas de la letra."""
+
     for texto, emoji, espera in letra:
         time.sleep(espera)
         linea = f"{texto} {emoji}"
+
         if modo_maquina_de_escribir:
-            efecto_maquina_de_escribir(linea, usar_color=usar_color)
+            efecto_maquina_de_escribir(
+                linea,
+                usar_color=usar_color
+            )
+
         else:
             if usar_color:
                 color = random.choice(COLORES)
@@ -68,3 +78,4 @@ def print_lyrics(letra, modo_maquina_de_escribir=True, usar_color=False):
 
 if __name__ == "__main__":
     print_lyrics(letra, modo_maquina_de_escribir=True, usar_color=True)
+    input("\n...")
